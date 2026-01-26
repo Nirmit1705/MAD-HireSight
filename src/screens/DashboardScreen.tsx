@@ -8,9 +8,11 @@ import {
   StatusBar,
   Dimensions,
   Animated,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomNavBar from '../components/BottomNavBar';
+import PerformanceChart from '../components/PerformanceChart';
 
 const { width } = Dimensions.get('window');
 
@@ -60,7 +62,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         }
       ]}>
         <View style={styles.headerLeft}>
-          <Icon name="target" size={40} color="#fff" />
+          <Image source={require('../assets/logo.png')} style={styles.logoImage} />
           <Text style={styles.headerTitle}>HireSight</Text>
         </View>
         <TouchableOpacity style={styles.profileButton} onPress={() => setActiveTab('Profile')}>
@@ -77,7 +79,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>
           <Text style={styles.welcomeText}>Welcome back,</Text>
-          <Text style={styles.userName}>23IT087 PATEL NIRMIT AMIT!</Text>
+          <Text style={styles.userName}>John Doe!</Text>
           <Text style={styles.subtitle}>Track your progress and improve your interview skills</Text>
         </View>
 
@@ -85,7 +87,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         <View style={styles.statsGrid}>
           {/* Aptitude Score Card */}
           <View style={styles.statCard}>
-            <Icon name="brain" size={32} color="#ef4444" style={styles.statIcon} />
+            <Icon name="brain" size={32} color="#000" style={styles.statIcon} />
             <Text style={styles.statValue}>50%</Text>
             <Text style={styles.statLabel}>Aptitude Score</Text>
             <Text style={styles.statSubLabel}>Latest test result</Text>
@@ -93,7 +95,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
           {/* Interview Score Card */}
           <View style={styles.statCard}>
-            <Icon name="video" size={32} color="#16a34a" style={styles.statIcon} />
+            <Icon name="video" size={32} color="#000" style={styles.statIcon} />
             <Text style={[styles.statValue, { color: '#16a34a' }]}>87%</Text>
             <Text style={styles.statLabel}>Interview Score</Text>
             <Text style={styles.statSubLabel}>Latest interview result</Text>
@@ -101,7 +103,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
           {/* Overall Performance Card */}
           <View style={styles.statCard}>
-            <Icon name="chart-line" size={32} color="#ea580c" style={styles.statIcon} />
+            <Icon name="chart-line" size={32} color="#000" style={styles.statIcon} />
             <Text style={[styles.statValue, { color: '#ea580c' }]}>73%</Text>
             <Text style={styles.statLabel}>Overall Performance</Text>
             <Text style={styles.statSubLabel}>Average across all tests</Text>
@@ -124,35 +126,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           </View>
           <Text style={styles.sectionSubtitle}>Overall Score (Aptitude + Interview)</Text>
           
-          {/* Graph Placeholder with Visual Data */}
-          <View style={styles.graphContainer}>
-            <View style={styles.graphYAxis}>
-              <Text style={styles.yAxisLabel}>100</Text>
-              <Text style={styles.yAxisLabel}>75</Text>
-              <Text style={styles.yAxisLabel}>50</Text>
-              <Text style={styles.yAxisLabel}>25</Text>
-              <Text style={styles.yAxisLabel}>0</Text>
-            </View>
-            <View style={styles.graphContent}>
-              {/* Simulated line chart */}
-              <View style={styles.graphLine} />
-              <View style={[styles.dataPoint, { bottom: '15%', left: '10%' }]}>
-                <View style={styles.dot} />
-              </View>
-              <View style={[styles.dataPoint, { bottom: '50%', left: '40%' }]}>
-                <View style={styles.dot} />
-              </View>
-              <View style={[styles.dataPoint, { bottom: '75%', left: '90%' }]}>
-                <View style={styles.dotLarge} />
-              </View>
-              
-              <View style={styles.xAxisLabels}>
-                <Text style={styles.xAxisLabel}>Aug 25</Text>
-                <Text style={styles.xAxisLabel}>Sep 25</Text>
-                <Text style={styles.xAxisLabel}>Nov 25</Text>
-              </View>
-            </View>
-          </View>
+          <PerformanceChart />
 
           {/* Performance Stats */}
           <View style={styles.performanceStats}>
@@ -247,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    paddingTop: 20,
+    paddingTop: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -262,11 +236,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  logoImage: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
+  },
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-    marginLeft: 12,
+    marginLeft: 0,
   },
   profileButton: {
     padding: 4,
@@ -312,14 +291,13 @@ const styles = StyleSheet.create({
   welcomeSection: {
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    paddingVertical: 20,
   },
   welcomeText: {
     fontSize: 15,
     color: '#6b7280',
   },
   userName: {
-    fontSize: 22,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#111827',
     marginTop: 2,
@@ -391,69 +369,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6b7280',
     marginBottom: 16,
-  },
-  graphContainer: {
-    flexDirection: 'row',
-    height: 180,
-    marginBottom: 20,
-  },
-  graphYAxis: {
-    width: 35,
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-  },
-  yAxisLabel: {
-    fontSize: 10,
-    color: '#9ca3af',
-  },
-  graphContent: {
-    flex: 1,
-    position: 'relative',
-    borderLeftWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#e5e7eb',
-    marginLeft: 6,
-  },
-  graphLine: {
-    position: 'absolute',
-    bottom: '15%',
-    left: '10%',
-    right: 0,
-    height: 2,
-    backgroundColor: '#111827',
-    transform: [{ rotate: '20deg' }],
-  },
-  dataPoint: {
-    position: 'absolute',
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#111827',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  dotLarge: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#111827',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  xAxisLabels: {
-    position: 'absolute',
-    bottom: -22,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
-  },
-  xAxisLabel: {
-    fontSize: 10,
-    color: '#9ca3af',
   },
   performanceStats: {
     flexDirection: 'row',
@@ -560,98 +475,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#111827',
     fontStyle: 'italic',
-  },
-  recommendationCard: {
-    backgroundColor: '#fafafa',
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  recommendationTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 6,
-  },
-  recommendationDesc: {
-    fontSize: 13,
-    color: '#6b7280',
-    lineHeight: 18,
-    marginBottom: 12,
-  },
-  actionButton: {
-    backgroundColor: '#000',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  actionButtonSecondary: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  actionButtonTextSecondary: {
-    color: '#000',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  activityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  activityIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#dbeafe',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  activityContent: {
-    flex: 1,
-  },
-  activityTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 3,
-  },
-  activityDate: {
-    fontSize: 12,
-    color: '#9ca3af',
-  },
-  activityScore: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  activityScoreText: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#16a34a',
-  },
-  viewAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    marginTop: 4,
-  },
-  viewAllText: {
-    fontSize: 13,
-    color: '#111827',
-    fontWeight: '500',
   },
   bottomSpacing: {
     height: 100,
