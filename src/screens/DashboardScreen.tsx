@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   Dimensions,
+  Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomNavBar from '../components/BottomNavBar';
@@ -19,25 +20,59 @@ interface DashboardScreenProps {
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const headerAnimation = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.timing(headerAnimation, {
+      toValue: showHeader ? 1 : 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [showHeader]);
+
+  const handleScroll = (event: any) => {
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      setShowHeader(false);
+    } else if (currentScrollY < lastScrollY) {
+      setShowHeader(true);
+    }
+    setLastScrollY(currentScrollY);
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       
       {/* Header */}
-      <View style={styles.header}>
+      <Animated.View style={[
+        styles.header,
+        {
+          opacity: headerAnimation,
+          transform: [{
+            translateY: headerAnimation.interpolate({
+              inputRange: [0, 1],
+              outputRange: [-100, 0],
+            })
+          }]
+        }
+      ]}>
         <View style={styles.headerLeft}>
-          <Icon name="target" size={32} color="#fff" />
+          <Icon name="target" size={40} color="#fff" />
           <Text style={styles.headerTitle}>HireSight</Text>
         </View>
         <TouchableOpacity style={styles.profileButton} onPress={() => setActiveTab('Profile')}>
-          <Icon name="account-circle" size={40} color="#fff" />
+          <Icon name="account-circle" size={50} color="#fff" />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       <ScrollView 
-        style={styles.scrollView} 
+        style={[styles.scrollView, !showHeader && styles.scrollViewNoHeader]} 
         showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>
@@ -211,8 +246,8 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#000',
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingTop: 50,
+    paddingVertical: 10,
+    paddingTop: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -228,10 +263,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-    marginLeft: 10,
+    marginLeft: 12,
   },
   profileButton: {
     padding: 4,
@@ -269,7 +304,10 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 98,
+    paddingTop: 92,
+  },
+  scrollViewNoHeader: {
+    paddingTop: 0,
   },
   welcomeSection: {
     backgroundColor: '#fff',
