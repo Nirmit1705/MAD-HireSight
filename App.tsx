@@ -9,8 +9,9 @@ import SplashScreen from './src/screens/SplashScreen';
 import LandingScreen from './src/screens/LandingScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import SignInScreen from './src/screens/SignInScreen';
+import DashboardScreen from './src/screens/DashboardScreen';
 
-type Screen = 'splash' | 'landing' | 'signup' | 'signin';
+type Screen = 'splash' | 'landing' | 'signup' | 'signin' | 'dashboard';
 
 function App(): JSX.Element {
   const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
@@ -31,6 +32,14 @@ function App(): JSX.Element {
     setCurrentScreen('landing');
   };
 
+  const navigateToDashboard = () => {
+    setCurrentScreen('dashboard');
+  };
+
+  const handleLogout = () => {
+    setCurrentScreen('landing');
+  };
+
   if (currentScreen === 'splash') {
     return <SplashScreen onFinish={handleSplashFinish} />;
   }
@@ -40,7 +49,11 @@ function App(): JSX.Element {
   }
 
   if (currentScreen === 'signin') {
-    return <SignInScreen onSignUp={navigateToSignUp} onBack={navigateToLanding} />;
+    return <SignInScreen onSignUp={navigateToSignUp} onBack={navigateToLanding} onSignInSuccess={navigateToDashboard} />;
+  }
+
+  if (currentScreen === 'dashboard') {
+    return <DashboardScreen onLogout={handleLogout} />;
   }
 
   return <LandingScreen onSignUp={navigateToSignUp} onSignIn={navigateToSignIn} />;

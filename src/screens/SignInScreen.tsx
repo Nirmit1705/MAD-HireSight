@@ -16,9 +16,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 interface SignInScreenProps {
   onSignUp: () => void;
   onBack: () => void;
+  onSignInSuccess?: () => void;
 }
 
-const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack }) => {
+const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -40,6 +41,10 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack }) => {
   const handleSignIn = () => {
     console.log('Signing in with:', email);
     // TODO: Implement sign in logic
+    // For now, navigate to dashboard
+    if (onSignInSuccess) {
+      onSignInSuccess();
+    }
   };
 
   const handleSignUp = () => {
