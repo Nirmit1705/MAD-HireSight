@@ -23,6 +23,10 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  
+  // Validation errors
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
     const backAction = () => {
@@ -38,7 +42,40 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
     return () => backHandler.remove();
   }, [onBack]);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSignIn = () => {
+    // Reset errors
+    setEmailError('');
+    setPasswordError('');
+
+    let isValid = true;
+
+    // Validate email format
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      isValid = false;
+    }
+
+    // Validate password length
+    if (!password) {
+      setPasswordError('Password is required');
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      isValid = false;
+    }
+
+    if (!isValid) {
+      return;
+    }
+
     console.log('Signing in with:', email);
     // TODO: Implement sign in logic
     // For now, navigate to dashboard
@@ -84,26 +121,33 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email Address</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, emailError ? styles.inputError : null]}
               placeholder="Enter your email"
               placeholderTextColor="#999"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (emailError) setEmailError('');
+              }}
               keyboardType="email-address"
               autoCapitalize="none"
             />
+            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
           </View>
 
           {/* Password Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
+            <View style={[styles.passwordContainer, passwordError ? styles.inputError : null]}>
               <TextInput
                 style={styles.passwordInput}
                 placeholder="Enter your password"
                 placeholderTextColor="#999"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  if (passwordError) setPasswordError('');
+                }}
                 secureTextEntry={secureTextEntry}
                 autoCapitalize="none"
               />
@@ -117,6 +161,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
                 />
               </TouchableOpacity>
             </View>
+            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
           </View>
 
           {/* Forgot Password Link */}
@@ -314,6 +359,16 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     fontWeight: '600',
     textDecorationLine: 'underline',
+  },
+  inputError: {
+    borderColor: '#FF3B30',
+    borderWidth: 1.5,
+  },
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
 });
 
