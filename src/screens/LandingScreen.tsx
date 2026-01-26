@@ -11,15 +11,20 @@ import {
 
 const { width } = Dimensions.get('window');
 
-const LandingScreen: React.FC = () => {
+interface LandingScreenProps {
+  onSignUp: () => void;
+  onSignIn: () => void;
+}
+
+const LandingScreen: React.FC<LandingScreenProps> = ({ onSignUp, onSignIn }) => {
   const handleSignUp = () => {
     console.log('Sign Up pressed');
-    // TODO: Navigate to sign up screen
+    onSignUp();
   };
 
   const handleSignIn = () => {
     console.log('Sign In pressed');
-    // TODO: Navigate to sign in screen
+    onSignIn();
   };
 
   return (
@@ -59,18 +64,6 @@ const LandingScreen: React.FC = () => {
             activeOpacity={0.8}>
             <Text style={styles.signInButtonText}>Sign In</Text>
           </TouchableOpacity>
-
-          <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.divider} />
-          </View>
-
-          <TouchableOpacity 
-            style={styles.guestButton}
-            activeOpacity={0.8}>
-            <Text style={styles.guestButtonText}>Continue as Guest</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -96,26 +89,26 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   brandingSection: {
-    marginBottom: 60,
+    marginBottom: 80,
     alignItems: 'center',
   },
   logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 24,
+    width: 140,
+    height: 140,
+    marginBottom: 28,
   },
   appNameCenter: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: 'bold',
     color: '#1A1A1A',
     letterSpacing: 1,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   tagline: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#666',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 26,
     paddingHorizontal: 20,
   },
   buttonContainer: {
@@ -123,10 +116,10 @@ const styles = StyleSheet.create({
   },
   signUpButton: {
     backgroundColor: '#1A1A1A',
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -143,43 +136,16 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     backgroundColor: '#FAFAFA',
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#1A1A1A',
-    marginBottom: 24,
   },
   signInButtonText: {
     color: '#1A1A1A',
     fontSize: 18,
     fontWeight: '600',
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#DDD',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#999',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  guestButton: {
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  guestButtonText: {
-    color: '#666',
-    fontSize: 16,
-    fontWeight: '500',
-    textDecorationLine: 'underline',
   },
   footer: {
     paddingHorizontal: 24,
