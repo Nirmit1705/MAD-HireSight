@@ -7,19 +7,43 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import SplashScreen from './src/screens/SplashScreen';
 import LandingScreen from './src/screens/LandingScreen';
+import SignUpScreen from './src/screens/SignUpScreen';
+import SignInScreen from './src/screens/SignInScreen';
+
+type Screen = 'splash' | 'landing' | 'signup' | 'signin';
 
 function App(): JSX.Element {
-  const [showSplash, setShowSplash] = useState(true);
+  const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
 
   const handleSplashFinish = () => {
-    setShowSplash(false);
+    setCurrentScreen('landing');
   };
 
-  if (showSplash) {
+  const navigateToSignUp = () => {
+    setCurrentScreen('signup');
+  };
+
+  const navigateToSignIn = () => {
+    setCurrentScreen('signin');
+  };
+
+  const navigateToLanding = () => {
+    setCurrentScreen('landing');
+  };
+
+  if (currentScreen === 'splash') {
     return <SplashScreen onFinish={handleSplashFinish} />;
   }
 
-  return <LandingScreen />;
+  if (currentScreen === 'signup') {
+    return <SignUpScreen onSignIn={navigateToSignIn} onBack={navigateToLanding} />;
+  }
+
+  if (currentScreen === 'signin') {
+    return <SignInScreen onSignUp={navigateToSignUp} onBack={navigateToLanding} />;
+  }
+
+  return <LandingScreen onSignUp={navigateToSignUp} onSignIn={navigateToSignIn} />;
 }
 
 export default App;
