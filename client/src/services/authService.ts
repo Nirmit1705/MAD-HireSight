@@ -28,9 +28,7 @@ export class AuthService {
     password: string,
     confirmPassword: string
   ): Promise<AuthResponse> {
-    try {
-      console.log('Attempting signup with:', { name, email, url: `${API_BASE_URL}/signup` });
-      
+    try {      
       const response = await fetch(`${API_BASE_URL}/signup`, {
         method: 'POST',
         headers: {
@@ -44,11 +42,7 @@ export class AuthService {
         }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-
       const data: AuthResponse = await response.json();
-      console.log('Response data:', data);
 
       if (data.success && data.data) {
         // Store tokens
@@ -59,7 +53,6 @@ export class AuthService {
 
       return data;
     } catch (error) {
-      console.error('Signup error caught:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
