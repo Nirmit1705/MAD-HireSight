@@ -57,7 +57,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
           resizeMode="contain"
         />
         <Text style={styles.appName}>HireSight</Text>
-        <Text style={styles.tagline}>Find Your Perfect Match</Text>
+        <Text style={styles.tagline}>Prepare. Learn. Grow.</Text>
       </Animated.View>
     </View>
   );

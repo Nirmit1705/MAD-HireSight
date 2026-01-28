@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "955493235709",
+    "project_id": "mad-project-aa21f",
+    "storage_bucket": "mad-project-aa21f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955493235709:android:4bd585532134d8323c3794",
+        "android_client_info": {
+          "package_name": "com.hiresight.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "955493235709-n2rk164pnhtsie8bpaj33j4mhugir137.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hiresight.mobile",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "955493235709-htnam5ci932okmng0qf6gje0bk4lapjh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZ9eayNlxQuvv4li9WK3f1wCIYFzhXjRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "955493235709-htnam5ci932okmng0qf6gje0bk4lapjh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

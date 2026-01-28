@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.madproject"
+    namespace "com.hiresight.mobile"
     defaultConfig {
-        applicationId "com.madproject"
+        applicationId "com.hiresight.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

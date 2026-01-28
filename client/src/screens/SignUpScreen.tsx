@@ -10,21 +10,27 @@ import {
   KeyboardAvoidingView,
   Platform,
   BackHandler,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import GoogleSignInButton from '../components/GoogleSignInButton';
+import { AuthService } from '../services/authService';
 
 interface SignUpScreenProps {
   onSignIn: () => void;
   onBack: () => void;
+  onSignUpSuccess?: () => void;
 }
 
-const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack }) => {
+const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack, onSignUpSuccess }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [secureConfirmEntry, setSecureConfirmEntry] = useState(true);
+  const [loading, setLoading] = useState(false);
   
   // Validation errors
   const [emailError, setEmailError] = useState('');
@@ -50,13 +56,19 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack }) => {
     return emailRegex.test(email);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     // Reset errors
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
 
     let isValid = true;
+
+    // Validate full name
+    if (!fullName.trim()) {
+      Alert.alert('Validation Error', 'Please enter your full name');
+      isValid = false;
+    }
 
     // Validate email format
     if (!email.trim()) {
@@ -71,8 +83,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack }) => {
     if (!password) {
       setPasswordError('Password is required');
       isValid = false;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+    } else if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
       isValid = false;
     }
 
@@ -89,8 +101,31 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack }) => {
       return;
     }
 
-    console.log('Creating account for:', email);
-    // TODO: Implement sign up logic
+    try {
+      setLoading(true);
+      const result = await AuthService.signUp(fullName, email, password, confirmPassword);
+      
+      if (result.success && result.data) {
+        console.log('Sign up successful:', result.data.user);
+        Alert.alert('Success', 'Account created successfully!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              if (onSignUpSuccess) {
+                onSignUpSuccess();
+              }
+            },
+          },
+        ]);
+      } else {
+        Alert.alert('Sign Up Failed', result.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+      console.error('Sign up error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignIn = () => {
@@ -214,8 +249,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack }) => {
           <TouchableOpacity
             style={styles.signUpButton}
             onPress={handleSignUp}
+            disabled={loading}
             activeOpacity={0.8}>
-            <Text style={styles.signUpButtonText}>Create Account</Text>
+            {loading ? (
+              <ActivityIndicator color="#FAFAFA" />
+            ) : (
+              <Text style={styles.signUpButtonText}>Create Account</Text>
+            )}
           </TouchableOpacity>
 
           {/* Divider */}
@@ -225,11 +265,18 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack }) => {
             <View style={styles.divider} />
           </View>
 
-          {/* Social Sign Up Options */}
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
-            <Icon name="logo-google" size={20} color="#1A1A1A" style={styles.socialIcon} />
-            <Text style={styles.socialButtonText}>Continue with Google</Text>
-          </TouchableOpacity>
+          {/* Google Sign In */}
+          <GoogleSignInButton
+            onSuccess={(user) => {
+              console.log('Google sign up success:', user);
+              if (onSignUpSuccess) {
+                onSignUpSuccess();
+              }
+            }}
+            onError={(error) => {
+              console.error('Google sign up error:', error);
+            }}
+          />
         </View>
 
         {/* Sign In Link */}
@@ -353,25 +400,6 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 14,
     fontWeight: '500',
-  },
-  socialButton: {
-    backgroundColor: '#FAFAFA',
-    paddingVertical: 14,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#1A1A1A',
-    marginBottom: 12,
-  },
-  socialIcon: {
-    marginRight: 8,
-  },
-  socialButtonText: {
-    color: '#1A1A1A',
-    fontSize: 16,
-    fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',

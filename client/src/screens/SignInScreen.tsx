@@ -10,8 +10,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   BackHandler,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import GoogleSignInButton from '../components/GoogleSignInButton';
+import { AuthService } from '../services/authService';
 
 interface SignInScreenProps {
   onSignUp: () => void;
@@ -23,6 +27,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [loading, setLoading] = useState(false);
   
   // Validation errors
   const [emailError, setEmailError] = useState('');
@@ -47,7 +52,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
     return emailRegex.test(email);
   };
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     // Reset errors
     setEmailError('');
     setPasswordError('');
@@ -76,11 +81,23 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
       return;
     }
 
-    console.log('Signing in with:', email);
-    // TODO: Implement sign in logic
-    // For now, navigate to dashboard
-    if (onSignInSuccess) {
-      onSignInSuccess();
+    try {
+      setLoading(true);
+      const result = await AuthService.signIn(email, password);
+      
+      if (result.success && result.data) {
+        console.log('Sign in successful:', result.data.user);
+        if (onSignInSuccess) {
+          onSignInSuccess();
+        }
+      } else {
+        Alert.alert('Sign In Failed', result.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+      console.error('Sign in error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -175,8 +192,13 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
           <TouchableOpacity
             style={styles.signInButton}
             onPress={handleSignIn}
+            disabled={loading}
             activeOpacity={0.8}>
-            <Text style={styles.signInButtonText}>Sign In</Text>
+            {loading ? (
+              <ActivityIndicator color="#FAFAFA" />
+            ) : (
+              <Text style={styles.signInButtonText}>Sign In</Text>
+            )}
           </TouchableOpacity>
 
           {/* Divider */}
@@ -186,11 +208,18 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignUp, onBack, onSignInS
             <View style={styles.divider} />
           </View>
 
-          {/* Social Sign In Options */}
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
-            <Icon name="logo-google" size={20} color="#1A1A1A" style={styles.socialIcon} />
-            <Text style={styles.socialButtonText}>Continue with Google</Text>
-          </TouchableOpacity>
+          {/* Google Sign In */}
+          <GoogleSignInButton
+            onSuccess={(user) => {
+              console.log('Google sign in success:', user);
+              if (onSignInSuccess) {
+                onSignInSuccess();
+              }
+            }}
+            onError={(error) => {
+              console.error('Google sign in error:', error);
+            }}
+          />
         </View>
 
         {/* Sign Up Link */}
@@ -324,25 +353,6 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 14,
     fontWeight: '500',
-  },
-  socialButton: {
-    backgroundColor: '#FAFAFA',
-    paddingVertical: 14,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#1A1A1A',
-    marginBottom: 12,
-  },
-  socialIcon: {
-    marginRight: 8,
-  },
-  socialButtonText: {
-    color: '#1A1A1A',
-    fontSize: 16,
-    fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',

@@ -45,7 +45,7 @@ function App(): JSX.Element {
   }
 
   if (currentScreen === 'signup') {
-    return <SignUpScreen onSignIn={navigateToSignIn} onBack={navigateToLanding} />;
+    return <SignUpScreen onSignIn={navigateToSignIn} onBack={navigateToLanding} onSignUpSuccess={navigateToDashboard} />;
   }
 
   if (currentScreen === 'signin') {

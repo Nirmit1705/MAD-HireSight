@@ -1,4 +1,7 @@
 {
   "name": "MADProject",
-  "displayName": "MADProject"
+  "displayName": "MADProject",
+  "android": {
+    "package": "com.hiresight.mobile"
+  }
 }
