@@ -13,6 +13,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomNavBar from '../components/BottomNavBar';
 import PerformanceChart from '../components/PerformanceChart';
+import ProfileScreen from './ProfileScreen';
+import { AuthService } from '../services/authService';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +26,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const headerAnimation = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -34,6 +37,24 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     }).start();
   }, [showHeader]);
 
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  useEffect(() => {
+    // Refresh user data when returning from profile screen
+    if (activeTab === 'Dashboard') {
+      loadUserData();
+    }
+  }, [activeTab]);
+
+  const loadUserData = async () => {
+    const userData = await AuthService.getUser();
+    if (userData) {
+      setUser(userData);
+    }
+  };
+
   const handleScroll = (event: any) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
     if (currentScrollY > lastScrollY && currentScrollY > 50) {
@@ -43,6 +64,16 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     }
     setLastScrollY(currentScrollY);
   };
+
+  // Render Profile Screen if active
+  if (activeTab === 'Profile') {
+    return (
+      <ProfileScreen 
+        onBack={() => setActiveTab('Dashboard')} 
+        onLogout={() => onLogout && onLogout()} 
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -76,129 +107,150 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        {/* Welcome Section */}
-        <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>Welcome back,</Text>
-          <Text style={styles.userName}>John Doe!</Text>
-          <Text style={styles.subtitle}>Track your progress and improve your interview skills</Text>
+        {/* Welcome Section with Gradient Card */}
+        <View style={styles.welcomeCard}>
+          <View style={styles.welcomeContent}>
+            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.userName}>{user?.name || 'User'}!</Text>
+            <Text style={styles.subtitle}>Track your progress and improve your interview skills</Text>
+          </View>
         </View>
 
-        {/* Stats Cards Grid */}
+        {/* Stats Cards Grid - Modern Design */}
         <View style={styles.statsGrid}>
           {/* Aptitude Score Card */}
-          <View style={styles.statCard}>
-            <Icon name="brain" size={32} color="#000" style={styles.statIcon} />
-            <Text style={styles.statValue}>50%</Text>
-            <Text style={styles.statLabel}>Aptitude Score</Text>
-            <Text style={styles.statSubLabel}>Latest test result</Text>
+          <View style={[styles.statCard]}>
+            <View style={styles.statIconCircle}>
+              <Icon name="brain" size={28} color="#fff" />
+            </View>
+            <View style={styles.statContent}>
+              <Text style={styles.statValue}>50%</Text>
+              <Text style={styles.statLabel}>Aptitude</Text>
+            </View>
           </View>
 
           {/* Interview Score Card */}
-          <View style={styles.statCard}>
-            <Icon name="video" size={32} color="#000" style={styles.statIcon} />
-            <Text style={[styles.statValue, { color: '#16a34a' }]}>87%</Text>
-            <Text style={styles.statLabel}>Interview Score</Text>
-            <Text style={styles.statSubLabel}>Latest interview result</Text>
+          <View style={[styles.statCard]}>
+            <View style={styles.statIconCircle}>
+              <Icon name="video" size={28} color="#fff" />
+            </View>
+            <View style={styles.statContent}>
+              <Text style={styles.statValue}>87%</Text>
+              <Text style={styles.statLabel}>Interview</Text>
+            </View>
           </View>
 
           {/* Overall Performance Card */}
-          <View style={styles.statCard}>
-            <Icon name="chart-line" size={32} color="#000" style={styles.statIcon} />
-            <Text style={[styles.statValue, { color: '#ea580c' }]}>73%</Text>
-            <Text style={styles.statLabel}>Overall Performance</Text>
-            <Text style={styles.statSubLabel}>Average across all tests</Text>
+          <View style={[styles.statCard]}>
+            <View style={styles.statIconCircle}>
+              <Icon name="chart-line" size={28} color="#fff" />
+            </View>
+            <View style={styles.statContent}>
+              <Text style={styles.statValue}>73%</Text>
+              <Text style={styles.statLabel}>Overall</Text>
+            </View>
           </View>
 
           {/* Completed Sessions Card */}
-          <View style={styles.statCard}>
-            <Icon name="trophy" size={32} color="#000" style={styles.statIcon} />
-            <Text style={styles.statValue}>20</Text>
-            <Text style={styles.statLabel}>Completed Sessions</Text>
-            <Text style={styles.statSubLabel}>Interviews & aptitude tests</Text>
+          <View style={[styles.statCard]}>
+            <View style={styles.statIconCircle}>
+              <Icon name="trophy" size={28} color="#fff" />
+            </View>
+            <View style={styles.statContent}>
+              <Text style={styles.statValue}>20</Text>
+              <Text style={styles.statLabel}>Sessions</Text>
+            </View>
           </View>
         </View>
 
-        {/* Performance Trend Section */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <Icon name="chart-line-variant" size={24} color="#1a1a1a" />
-            <Text style={styles.sectionTitle}>Performance Trend</Text>
+        {/* Performance Trend Section - Modern Card */}
+        <View style={styles.modernCard}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderLeft}>
+              <View style={styles.iconBadge}>
+                <Icon name="chart-line-variant" size={20} color="#fff" />
+              </View>
+              <Text style={styles.cardTitle}>Performance Trend</Text>
+            </View>
           </View>
-          <Text style={styles.sectionSubtitle}>Overall Score (Aptitude + Interview)</Text>
+          <Text style={styles.cardSubtitle}>Overall Score (Aptitude + Interview)</Text>
           
           <PerformanceChart />
 
-          {/* Performance Stats */}
-          <View style={styles.performanceStats}>
-            <View style={styles.performanceStat}>
-              <Text style={styles.performanceValue}>87%</Text>
-              <Text style={styles.performanceLabel}>Last Recorded</Text>
+          {/* Performance Stats - Modern Pills */}
+          <View style={styles.performanceStatsRow}>
+            <View style={styles.performancePill}>
+              <Text style={styles.pillValue}>87%</Text>
+              <Text style={styles.pillLabel}>Latest</Text>
             </View>
-            <View style={styles.performanceStat}>
-              <Text style={styles.performanceValue}>90%</Text>
-              <Text style={styles.performanceLabel}>Highest Score</Text>
+            <View style={styles.performancePill}>
+              <Text style={styles.pillValue}>90%</Text>
+              <Text style={styles.pillLabel}>Peak</Text>
             </View>
-            <View style={styles.performanceStat}>
-              <Text style={[styles.performanceValue, styles.improvementText]}>+3%</Text>
-              <Text style={styles.performanceLabel}>Improvement</Text>
+            <View style={[styles.performancePill, styles.performancePillGreen]}>
+              <Text style={[styles.pillValue, styles.pillValueGreen]}>+3%</Text>
+              <Text style={styles.pillLabel}>Growth</Text>
             </View>
           </View>
         </View>
 
-        {/* AI Evaluation Summary */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <Icon name="robot" size={24} color="#1a1a1a" />
-            <Text style={styles.sectionTitle}>AI Evaluation Summary</Text>
+        {/* AI Evaluation Summary - Modern Design */}
+        <View style={styles.modernCard}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderLeft}>
+              <View style={[styles.iconBadge, styles.iconBadgeGreen]}>
+                <Icon name="robot" size={20} color="#fff" />
+              </View>
+              <Text style={styles.cardTitle}>AI Insights</Text>
+            </View>
+            <View style={styles.scoreBadge}>
+              <Text style={styles.scoreBadgeText}>87/100</Text>
+            </View>
           </View>
           
-          <View style={styles.aiScoreContainer}>
-            <Text style={styles.aiScore}>87/100</Text>
-            <Text style={styles.aiScoreLabel}>Overall ML Score</Text>
+          <Text style={styles.cardSubtitle}>Strengths</Text>
+
+          <View style={styles.strengthsSection}>
+            <View style={styles.strengthRow}>
+              <View style={styles.strengthItem}>
+                <Icon name="check-circle" size={18} color="#16a34a" />
+                <Text style={styles.strengthText}>Grammar</Text>
+              </View>
+              <View style={styles.strengthItem}>
+                <Icon name="check-circle" size={18} color="#16a34a" />
+                <Text style={styles.strengthText}>Vocabulary</Text>
+              </View>
+            </View>
+            <View style={styles.strengthRow}>
+              <View style={styles.strengthItem}>
+                <Icon name="check-circle" size={18} color="#16a34a" />
+                <Text style={styles.strengthText}>Confidence</Text>
+              </View>
+            </View>
           </View>
 
-          <View style={styles.feedbackContainer}>
-            <View style={styles.feedbackRow}>
-              <View style={styles.strengthsColumn}>
-                <View style={styles.feedbackHeader}>
-                  <Icon name="check-circle" size={18} color="#16a34a" />
-                  <Text style={styles.feedbackTitle}>Strengths</Text>
-                </View>
-                <View style={styles.tagContainer}>
-                  <View style={styles.tagGreen}>
-                    <Text style={styles.tagTextGreen}>Grammar</Text>
-                  </View>
-                  <View style={styles.tagGreen}>
-                    <Text style={styles.tagTextGreen}>Vocabulary</Text>
-                  </View>
-                  <View style={styles.tagGreen}>
-                    <Text style={styles.tagTextGreen}>Confidence</Text>
-                  </View>
-                </View>
-              </View>
-
-              <View style={styles.areasColumn}>
-                <View style={styles.feedbackHeader}>
-                  <Icon name="alert-circle" size={18} color="#ea580c" />
-                  <Text style={styles.feedbackTitle}>Areas to Improve</Text>
-                </View>
-                <View style={styles.tagContainer}>
-                  <View style={styles.tagOrange}>
-                    <Text style={styles.tagTextOrange}>Technical Depth</Text>
-                  </View>
-                  <View style={styles.tagOrange}>
-                    <Text style={styles.tagTextOrange}>Response Structure</Text>
-                  </View>
-                </View>
+          <Text style={[styles.cardSubtitle, { marginTop: 16 }]}>Areas to Improve</Text>
+          
+          <View style={styles.improvementSection}>
+            <View style={styles.improvementRow}>
+              <View style={styles.improvementItem}>
+                <Icon name="alert-circle" size={18} color="#ea580c" />
+                <Text style={styles.improvementText}>Technical Depth</Text>
               </View>
             </View>
-
-            <View style={styles.aiFeedbackBox}>
-              <Text style={styles.aiFeedbackLabel}>AI Feedback</Text>
-              <Text style={styles.aiFeedbackText}>
-                "Achieved 87% overall - excellent performance"
-              </Text>
+            <View style={styles.improvementRow}>
+              <View style={styles.improvementItem}>
+                <Icon name="alert-circle" size={18} color="#ea580c" />
+                <Text style={styles.improvementText}>Response Structure</Text>
+              </View>
             </View>
+          </View>
+
+          <View style={styles.aiFeedbackCard}>
+            <Icon name="lightbulb-on" size={20} color="#fbbf24" style={{ marginRight: 8 }} />
+            <Text style={styles.aiFeedbackText}>
+              Great job! Keep practicing technical concepts to reach 90%+
+            </Text>
           </View>
         </View>
 
@@ -250,36 +302,6 @@ const styles = StyleSheet.create({
   profileButton: {
     padding: 4,
   },
-  topNav: {
-    backgroundColor: '#000',
-    flexDirection: 'row',
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  tabButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 12,
-    position: 'relative',
-  },
-  tabLabel: {
-    fontSize: 11,
-    color: '#666',
-    marginTop: 2,
-  },
-  tabLabelActive: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  activeTabIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: '#fff',
-  },
   scrollView: {
     flex: 1,
     backgroundColor: '#fff',
@@ -288,193 +310,213 @@ const styles = StyleSheet.create({
   scrollViewNoHeader: {
     paddingTop: 0,
   },
-  welcomeSection: {
+  welcomeCard: {
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
+    marginHorizontal: 16,
+    marginTop: 1,
+    marginBottom: 20,
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  welcomeContent: {
+    alignItems: 'flex-start',
   },
   welcomeText: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#6b7280',
-  },
-  userName: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginTop: 2,
     marginBottom: 4,
   },
+  userName: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 8,
+  },
   subtitle: {
-    fontSize: 13,
+    fontSize: 15,
     color: '#9ca3af',
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 16,
-    gap: 16,
-    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    gap: 12,
+    marginBottom: 20,
   },
   statCard: {
-    width: (width - 48) / 2,
+    width: (width - 44) / 2,
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 20,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#e5e7eb',
   },
-  statIcon: {
-    marginBottom: 12,
+  statIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statContent: {
+    alignItems: 'flex-end',
   },
   statValue: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#ef4444',
-    marginBottom: 8,
+    color: '#111827',
+    marginBottom: 2,
   },
   statLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#111827',
-    textAlign: 'center',
-    marginBottom: 4,
+    color: '#4b5563',
   },
-  statSubLabel: {
-    fontSize: 11,
-    color: '#9ca3af',
-    textAlign: 'center',
-  },
-  sectionCard: {
+  modernCard: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 8,
-    borderRadius: 12,
+    marginBottom: 16,
+    borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     borderColor: '#e5e7eb',
   },
-  sectionHeader: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
+  cardHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  iconBadgeGreen: {
+    backgroundColor: '#000000',
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
     color: '#111827',
-    marginLeft: 8,
   },
-  sectionSubtitle: {
-    fontSize: 12,
+  cardSubtitle: {
+    fontSize: 14,
     color: '#6b7280',
     marginBottom: 16,
   },
-  performanceStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
+  scoreBadge: {
+    backgroundColor: '#f0fdf4',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-  performanceStat: {
+  scoreBadgeText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#16a34a',
+  },
+  performanceStatsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+  },
+  performancePill: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 16,
+    padding: 12,
     alignItems: 'center',
   },
-  performanceValue: {
+  performancePillGreen: {
+    backgroundColor: '#d1fae5',
+  },
+  pillValue: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#111827',
     marginBottom: 4,
   },
-  performanceLabel: {
+  pillValueGreen: {
+    color: '#16a34a',
+  },
+  pillLabel: {
     fontSize: 11,
     color: '#6b7280',
+    fontWeight: '500',
   },
-  improvementText: {
-    color: '#16a34a',
+  strengthsSection: {
+    gap: 10,
   },
-  aiScoreContainer: {
-    alignItems: 'center',
-    marginVertical: 16,
-    paddingVertical: 16,
+  strengthRow: {
+    flexDirection: 'row',
+    gap: 12,
   },
-  aiScore: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#16a34a',
-  },
-  aiScoreLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginTop: 4,
-  },
-  feedbackContainer: {
-    marginTop: 8,
-  },
-  feedbackRow: {
-    gap: 20,
-  },
-  strengthsColumn: {
-    marginBottom: 20,
-  },
-  areasColumn: {
-    marginBottom: 16,
-  },
-  feedbackHeader: {
+  strengthItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    backgroundColor: '#f0fdf4',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    gap: 6,
   },
-  feedbackTitle: {
+  strengthText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
-    marginLeft: 6,
-  },
-  tagContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tagGreen: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: '#d1fae5',
-  },
-  tagOrange: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: '#fed7aa',
-  },
-  tagTextGreen: {
-    fontSize: 12,
-    fontWeight: '500',
     color: '#065f46',
   },
-  tagTextOrange: {
-    fontSize: 12,
-    fontWeight: '500',
+  improvementSection: {
+    gap: 10,
+  },
+  improvementRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  improvementItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff7ed',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    gap: 6,
+  },
+  improvementText: {
+    fontSize: 14,
+    fontWeight: '600',
     color: '#9a3412',
   },
-  aiFeedbackBox: {
-    backgroundColor: '#f9fafb',
-    padding: 12,
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: '#e5e7eb',
-  },
-  aiFeedbackLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#6b7280',
-    marginBottom: 4,
+  aiFeedbackCard: {
+    backgroundColor: '#fffbeb',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 0.5,
+    borderColor: '#fbbf24',
   },
   aiFeedbackText: {
-    fontSize: 13,
-    color: '#111827',
-    fontStyle: 'italic',
+    fontSize: 14,
+    color: '#78350f',
+    fontWeight: '500',
+    flex: 1,
+    lineHeight: 20,
   },
   bottomSpacing: {
     height: 100,
