@@ -93,7 +93,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
           <ActivityIndicator color="#4285F4" size="small" />
         ) : (
           <>
-            <Icon name="logo-google" size={20} color="#DB4437" style={styles.icon} />
+            <Icon name="logo-google" size={20} color="#000000" style={styles.icon} />
             <Text style={styles.buttonText}>Continue with Google</Text>
           </>
         )}

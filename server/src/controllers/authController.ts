@@ -16,8 +16,8 @@ export class AuthController {
     body('name')
       .isLength({ min: 2, max: 50 })
       .trim()
-      .matches(/^[a-zA-Z\s]+$/)
-      .withMessage('Name must be between 2-50 characters and contain only letters and spaces'),
+      .matches(/^[a-zA-Z\s'-]+$/)
+      .withMessage('Name must be between 2-50 characters'),
     body('password')
       .isLength({ min: 8 })
       .withMessage('Password must be at least 8 characters long'),

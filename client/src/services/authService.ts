@@ -29,6 +29,8 @@ export class AuthService {
     confirmPassword: string
   ): Promise<AuthResponse> {
     try {
+      console.log('Attempting signup with:', { name, email, url: `${API_BASE_URL}/signup` });
+      
       const response = await fetch(`${API_BASE_URL}/signup`, {
         method: 'POST',
         headers: {
@@ -42,7 +44,11 @@ export class AuthService {
         }),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       const data: AuthResponse = await response.json();
+      console.log('Response data:', data);
 
       if (data.success && data.data) {
         // Store tokens
@@ -53,6 +59,7 @@ export class AuthService {
 
       return data;
     } catch (error) {
+      console.error('Signup error caught:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
@@ -179,5 +186,71 @@ export class AuthService {
   static async isAuthenticated(): Promise<boolean> {
     const token = await AsyncStorage.getItem('accessToken');
     return !!token;
+  }
+
+  /**
+   * Update user profile
+   */
+  static async updateProfile(name: string): Promise<AuthResponse> {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(`${API_BASE_URL.replace('/auth', '/user')}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          name,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        // Update stored user
+        const currentUser = await this.getUser();
+        const updatedUser = { ...currentUser, name: data.data.name };
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+
+      return data;
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Network error. Please check your connection.',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Delete user account
+   */
+  static async deleteAccount(): Promise<AuthResponse> {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(`${API_BASE_URL.replace('/auth', '/user')}/profile`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        await this.signOut();
+      }
+
+      return data;
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Network error. Please check your connection.',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 }

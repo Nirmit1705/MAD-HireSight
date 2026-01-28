@@ -118,7 +118,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignIn, onBack, onSignUpS
           },
         ]);
       } else {
-        Alert.alert('Sign Up Failed', result.message);
+        // Show more detailed error message
+        const errorMessage = result.error || result.message || 'Sign up failed';
+        Alert.alert('Sign Up Failed', errorMessage);
+        console.log('Sign up failed:', errorMessage);
       }
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
