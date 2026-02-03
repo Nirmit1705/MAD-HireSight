@@ -12,8 +12,12 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomNavBar from '../components/BottomNavBar';
+import Header from '../components/Header';
 import PerformanceChart from '../components/PerformanceChart';
 import ProfileScreen from './ProfileScreen';
+import PracticeModeScreen from './PracticeModeScreen';
+import AssessmentScreen from './AssessmentScreen';
+import PracticeTestScreen from './PracticeTestScreen';
 import { AuthService } from '../services/authService';
 
 const { width } = Dimensions.get('window');
@@ -27,15 +31,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  const headerAnimation = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.timing(headerAnimation, {
-      toValue: showHeader ? 1 : 0,
-      duration: 250,
-      useNativeDriver: true,
-    }).start();
-  }, [showHeader]);
+  const [showPracticeTest, setShowPracticeTest] = useState(false);
 
   useEffect(() => {
     loadUserData();
@@ -75,31 +71,52 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     );
   }
 
+  // Render Practice Test Screen if active
+  if (showPracticeTest) {
+    return (
+      <PracticeTestScreen 
+        onExit={() => setShowPracticeTest(false)}
+      />
+    );
+  }
+
+  // Render Practice Mode Screen if active
+  if (activeTab === 'Practice') {
+    return (
+      <View style={styles.container}>
+        <PracticeModeScreen 
+          showHeader={showHeader}
+          onProfilePress={() => setActiveTab('Profile')}
+          onScroll={handleScroll}
+          onStartPractice={() => setShowPracticeTest(true)}
+        />
+        <BottomNavBar activeTab={activeTab} onTabChange={setActiveTab} />
+      </View>
+    );
+  }
+
+  // Render Assessment Screen if active
+  if (activeTab === 'Assessment') {
+    return (
+      <View style={styles.container}>
+        <AssessmentScreen 
+          showHeader={showHeader}
+          onProfilePress={() => setActiveTab('Profile')}
+          onScroll={handleScroll}
+          onContinuePrevious={() => console.log('Continue with previous')}
+          onStartNew={() => console.log('Start new assessment')}
+        />
+        <BottomNavBar activeTab={activeTab} onTabChange={setActiveTab} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       
       {/* Header */}
-      <Animated.View style={[
-        styles.header,
-        {
-          opacity: headerAnimation,
-          transform: [{
-            translateY: headerAnimation.interpolate({
-              inputRange: [0, 1],
-              outputRange: [-100, 0],
-            })
-          }]
-        }
-      ]}>
-        <View style={styles.headerLeft}>
-          <Image source={require('../assets/logo.png')} style={styles.logoImage} />
-          <Text style={styles.headerTitle}>HireSight</Text>
-        </View>
-        <TouchableOpacity style={styles.profileButton} onPress={() => setActiveTab('Profile')}>
-          <Icon name="account-circle" size={50} color="#fff" />
-        </TouchableOpacity>
-      </Animated.View>
+      <Header showHeader={showHeader} onProfilePress={() => setActiveTab('Profile')} />
 
       <ScrollView 
         style={[styles.scrollView, !showHeader && styles.scrollViewNoHeader]} 
@@ -268,39 +285,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    backgroundColor: '#000',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    paddingTop: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    elevation: 4,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginLeft: 0,
-  },
-  profileButton: {
-    padding: 4,
   },
   scrollView: {
     flex: 1,
