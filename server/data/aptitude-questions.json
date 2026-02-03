@@ -1,0 +1,283 @@
+{
+  "questions": [
+    {
+      "questionText": "What is the time complexity of binary search?",
+      "options": ["O(n)", "O(log n)", "O(n²)", "O(1)"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "MEDIUM",
+      "explanation": "Binary search divides the search space in half with each comparison, resulting in O(log n) complexity.",
+      "tags": ["backend", "frontend", "full-stack"]
+    },
+    {
+      "questionText": "Which data structure follows LIFO principle?",
+      "options": ["Queue", "Stack", "Array", "Linked List"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "EASY",
+      "explanation": "Stack follows Last In First Out (LIFO) principle where the last element added is the first one to be removed.",
+      "tags": ["backend", "frontend", "full-stack"]
+    },
+    {
+      "questionText": "What does SQL stand for?",
+      "options": ["Structured Query Language", "Simple Query Language", "Standard Query Language", "System Query Language"],
+      "correctOption": 0,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "EASY",
+      "explanation": "SQL stands for Structured Query Language, used for managing relational databases.",
+      "tags": ["backend", "data", "full-stack"]
+    },
+    {
+      "questionText": "In REST API, which HTTP method is used to retrieve data?",
+      "options": ["POST", "PUT", "GET", "DELETE"],
+      "correctOption": 2,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "EASY",
+      "explanation": "GET method is used to retrieve data from a server in REST API.",
+      "tags": ["backend", "frontend", "full-stack"]
+    },
+    {
+      "questionText": "What is a database index?",
+      "options": ["A backup of data", "A data structure that improves query speed", "A type of database", "A user interface"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "MEDIUM",
+      "explanation": "A database index is a data structure that improves the speed of data retrieval operations.",
+      "tags": ["backend", "data", "full-stack"]
+    },
+    {
+      "questionText": "In React, what is a component?",
+      "options": ["A function that returns HTML", "A class or function that returns JSX", "A CSS style", "A database table"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "EASY",
+      "explanation": "React components are classes or functions that return JSX to describe what should appear on the screen.",
+      "tags": ["frontend", "full-stack"]
+    },
+    {
+      "questionText": "What is the difference between == and === in JavaScript?",
+      "options": ["No difference", "=== checks type and value", "== is faster", "=== is deprecated"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "MEDIUM",
+      "explanation": "=== (strict equality) checks both type and value, while == (loose equality) performs type coercion.",
+      "tags": ["frontend", "backend", "full-stack"]
+    },
+    {
+      "questionText": "Which CSS property is used to make elements flexible?",
+      "options": ["display: block", "display: flex", "position: relative", "float: left"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "EASY",
+      "explanation": "display: flex makes an element a flex container, enabling flexible layouts.",
+      "tags": ["frontend", "full-stack"]
+    },
+    {
+      "questionText": "What is closure in JavaScript?",
+      "options": ["A way to close browser", "A function with access to outer scope", "A type of loop", "An error handling mechanism"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "HARD",
+      "explanation": "Closure is a function that has access to variables in its outer (enclosing) scope even after the outer function returns.",
+      "tags": ["frontend", "backend", "full-stack"]
+    },
+    {
+      "questionText": "What is machine learning?",
+      "options": ["A programming language", "A subset of AI that learns from data", "A type of database", "A web framework"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "MEDIUM",
+      "explanation": "Machine learning is a subset of artificial intelligence that enables systems to learn from data without explicit programming.",
+      "tags": ["aiml", "data"]
+    },
+    {
+      "questionText": "What is Docker?",
+      "options": ["A programming language", "A containerization platform", "A database", "A text editor"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "MEDIUM",
+      "explanation": "Docker is a platform that uses containerization to package applications and their dependencies.",
+      "tags": ["backend", "cloud", "full-stack"]
+    },
+    {
+      "questionText": "What is AWS?",
+      "options": ["A programming language", "Amazon Web Services cloud platform", "A database system", "A mobile app"],
+      "correctOption": 1,
+      "category": "DOMAIN_KNOWLEDGE",
+      "difficulty": "EASY",
+      "explanation": "AWS (Amazon Web Services) is a comprehensive cloud computing platform provided by Amazon.",
+      "tags": ["cloud", "backend"]
+    },
+    {
+      "questionText": "If a product costs $120 after a 20% discount, what was the original price?",
+      "options": ["$140", "$144", "$150", "$160"],
+      "correctOption": 2,
+      "category": "QUANTITATIVE_APTITUDE",
+      "difficulty": "MEDIUM",
+      "explanation": "If 80% of original price = $120, then original price = $120 ÷ 0.8 = $150",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "What is 15% of 240?",
+      "options": ["36", "30", "42", "45"],
+      "correctOption": 0,
+      "category": "QUANTITATIVE_APTITUDE",
+      "difficulty": "EASY",
+      "explanation": "15% of 240 = 0.15 × 240 = 36",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "A train travels 300 km in 4 hours. What is its average speed?",
+      "options": ["70 km/h", "75 km/h", "80 km/h", "85 km/h"],
+      "correctOption": 1,
+      "category": "QUANTITATIVE_APTITUDE",
+      "difficulty": "EASY",
+      "explanation": "Average speed = Total distance ÷ Total time = 300 ÷ 4 = 75 km/h",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "If 2x + 5 = 15, what is the value of x?",
+      "options": ["3", "5", "7", "10"],
+      "correctOption": 1,
+      "category": "QUANTITATIVE_APTITUDE",
+      "difficulty": "EASY",
+      "explanation": "2x + 5 = 15, so 2x = 10, therefore x = 5",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "What is the compound interest on $1000 for 2 years at 10% per annum?",
+      "options": ["$200", "$210", "$220", "$240"],
+      "correctOption": 1,
+      "category": "QUANTITATIVE_APTITUDE",
+      "difficulty": "MEDIUM",
+      "explanation": "Amount = 1000(1.1)² = 1210, so compound interest = 1210 - 1000 = $210",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "A shopkeeper sells an item for $85 and gains 25%. What was the cost price?",
+      "options": ["$65", "$68", "$70", "$72"],
+      "correctOption": 1,
+      "category": "QUANTITATIVE_APTITUDE",
+      "difficulty": "MEDIUM",
+      "explanation": "If cost price is C, then 1.25C = 85, so C = 85 ÷ 1.25 = $68",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "What is the result of 8 × 7 - 3 × 4?",
+      "options": ["44", "40", "48", "36"],
+      "correctOption": 0,
+      "category": "QUANTITATIVE_APTITUDE",
+      "difficulty": "EASY",
+      "explanation": "Following order of operations: 8 × 7 = 56, 3 × 4 = 12, so 56 - 12 = 44",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "Complete the series: 2, 6, 12, 20, 30, ?",
+      "options": ["40", "42", "44", "46"],
+      "correctOption": 1,
+      "category": "LOGICAL_REASONING",
+      "difficulty": "MEDIUM",
+      "explanation": "Pattern: n(n+1) where n = 1,2,3,4,5,6. Next is 6×7 = 42",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "If all cats are animals and some animals are pets, which conclusion is correct?",
+      "options": ["All cats are pets", "Some cats are pets", "No cats are pets", "Cannot be determined"],
+      "correctOption": 3,
+      "category": "LOGICAL_REASONING",
+      "difficulty": "HARD",
+      "explanation": "We cannot determine the relationship between cats and pets from the given information.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "What comes next in the pattern: A, C, F, J, ?",
+      "options": ["M", "N", "O", "P"],
+      "correctOption": 2,
+      "category": "LOGICAL_REASONING",
+      "difficulty": "MEDIUM",
+      "explanation": "Pattern: +2, +3, +4, +5. A(+2)→C(+3)→F(+4)→J(+5)→O",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "In a group of 100 people, 70 like coffee, 60 like tea. How many like both if everyone likes at least one?",
+      "options": ["30", "40", "50", "60"],
+      "correctOption": 0,
+      "category": "LOGICAL_REASONING",
+      "difficulty": "HARD",
+      "explanation": "Using set theory: Coffee + Tea - Both = Total, so 70 + 60 - Both = 100, therefore Both = 30",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "If Monday is the 1st, what day is the 15th?",
+      "options": ["Sunday", "Monday", "Tuesday", "Wednesday"],
+      "correctOption": 1,
+      "category": "LOGICAL_REASONING",
+      "difficulty": "MEDIUM",
+      "explanation": "From 1st to 15th is 14 days. 14 ÷ 7 = 2 weeks exactly, so 15th is also Monday.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "Complete the analogy: Book : Author :: Painting : ?",
+      "options": ["Canvas", "Artist", "Color", "Frame"],
+      "correctOption": 1,
+      "category": "LOGICAL_REASONING",
+      "difficulty": "EASY",
+      "explanation": "A book is created by an author, similarly a painting is created by an artist.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "Choose the synonym of 'Abundant':",
+      "options": ["Scarce", "Plentiful", "Limited", "Rare"],
+      "correctOption": 1,
+      "category": "VERBAL_ABILITY",
+      "difficulty": "EASY",
+      "explanation": "Abundant means existing in large quantities, which is synonymous with plentiful.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "Choose the antonym of 'Volatile':",
+      "options": ["Stable", "Unstable", "Explosive", "Changeable"],
+      "correctOption": 0,
+      "category": "VERBAL_ABILITY",
+      "difficulty": "MEDIUM",
+      "explanation": "Volatile means liable to change rapidly, so its antonym is stable.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "Complete the sentence: 'The project was completed ___ schedule.'",
+      "options": ["ahead of", "behind of", "in front of", "back of"],
+      "correctOption": 0,
+      "category": "VERBAL_ABILITY",
+      "difficulty": "EASY",
+      "explanation": "The correct phrase is 'ahead of schedule' meaning completed before the planned time.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "Choose the correctly spelled word:",
+      "options": ["Acommodate", "Accommodate", "Acomodate", "Accomodate"],
+      "correctOption": 1,
+      "category": "VERBAL_ABILITY",
+      "difficulty": "MEDIUM",
+      "explanation": "The correct spelling is 'Accommodate' with double 'c' and double 'm'.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "What is the meaning of 'Ubiquitous'?",
+      "options": ["Rare", "Present everywhere", "Ancient", "Modern"],
+      "correctOption": 1,
+      "category": "VERBAL_ABILITY",
+      "difficulty": "HARD",
+      "explanation": "Ubiquitous means present, appearing, or found everywhere.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    },
+    {
+      "questionText": "Choose the word that doesn't belong: Apple, Orange, Carrot, Banana",
+      "options": ["Apple", "Orange", "Carrot", "Banana"],
+      "correctOption": 2,
+      "category": "VERBAL_ABILITY",
+      "difficulty": "EASY",
+      "explanation": "Carrot is a vegetable while Apple, Orange, and Banana are fruits.",
+      "tags": ["frontend", "backend", "full-stack", "data", "aiml", "cloud"]
+    }
+  ]
+}

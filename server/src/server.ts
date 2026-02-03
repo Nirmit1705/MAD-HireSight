@@ -80,8 +80,10 @@ const startServer = async () => {
     await prisma.$connect();
     console.log('Database connected successfully');
 
-    app.listen(config.port, () => {
-      console.log(`Server is running on port ${config.port}`);
+    app.listen(config.port, '0.0.0.0', () => {
+      console.log(`Server is running on port ${config.port} on all network interfaces`);
+      console.log(`Access from emulator: http://10.0.2.2:${config.port}`);
+      console.log(`Access from physical device: http://<YOUR_IP>:${config.port}`);
       console.log(`Environment: ${config.nodeEnv}`);
       console.log(`CORS origin: ${config.corsOrigin}`);
     });
