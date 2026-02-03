@@ -1,0 +1,332 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// USER MANAGEMENT
+// ================================
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  name        String?
+  passwordHash String?  // Optional for Google OAuth users
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  googleId    String? @unique
+  
+  // Relations
+  refreshTokens    RefreshToken[]
+  profile          UserProfile?
+  aptitudeTests    AptitudeTest[]
+  interviews       Interview[]
+  achievements     UserAchievement[]
+  feedback         Feedback[]
+  
+  @@map("users")
+}
+
+model UserProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Professional details
+  currentPosition   String?
+  experience        String?
+  skills            String[] // Array of skills
+  industry          String?
+  location          String?
+  
+  // Preferences
+  targetPositions   String[] // Array of target positions
+  preferredDomains  String[] // Array of preferred domains
+  
+  // Avatar/Profile image
+  avatarUrl         String?
+  
+  // Achievement tracking
+  totalHoursSpent   Float    @default(0) // For 10+ hours achievement
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("user_profiles")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@map("refresh_tokens")
+}
+
+// ================================
+// APTITUDE TEST SYSTEM
+// ================================
+
+model AptitudeQuestion {
+  id            String              @id @default(uuid())
+  questionText  String
+  options       String[]            // Array of multiple choice options
+  correctOption Int                 // Index of correct option (0-based)
+  category      AptitudeCategory
+  difficulty    DifficultyLevel     @default(MEDIUM)
+  explanation   String?             // Explanation for the correct answer
+  tags          String[]            @default([]) // Tags for categorization
+  
+  // Relations
+  testAnswers   AptitudeTestAnswer[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("aptitude_questions")
+}
+
+model AptitudeTest {
+  id              String              @id @default(uuid())
+  userId          String
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  position        Position            // Position chosen for this test (enum)
+  isPractice      Boolean             @default(false) // Practice tests are not stored in results
+  
+  // Test configuration
+  totalQuestions  Int                 @default(30)
+  timeLimit       Int                 @default(30) // 30 minutes
+  
+  // Test execution
+  startedAt       DateTime            @default(now())
+  completedAt     DateTime?
+  timeTaken       Int?                // in seconds
+  status          TestStatus          @default(IN_PROGRESS)
+  
+  // Evaluation results (only for non-practice tests)
+  domainKnowledgeScore    Float?      // Percentage score
+  quantitativeScore       Float?      // Percentage score
+  logicalReasoningScore   Float?      // Percentage score
+  verbalAbilityScore      Float?      // Percentage score
+  overallScore           Float?       // Overall percentage
+  
+  // Relations
+  answers         AptitudeTestAnswer[]
+  feedback        Feedback?
+  interviews      Interview[]  // Interviews that used this aptitude test
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("aptitude_tests")
+}
+
+model AptitudeTestAnswer {
+  id              String           @id @default(uuid())
+  testId          String
+  test            AptitudeTest     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionId      String
+  question        AptitudeQuestion @relation(fields: [questionId], references: [id])
+  
+  selectedOption  Int              // User's selected option (0-based)
+  isCorrect       Boolean
+  correctOption   Int              // Correct option for reference
+  timeTaken       Int?             // Time taken for this question in seconds
+  
+  createdAt       DateTime @default(now())
+  
+  // Ensure only one answer per test and question combination
+  @@unique([testId, questionId])
+  @@map("aptitude_test_answers")
+}
+
+// ================================
+// INTERVIEW SYSTEM
+// ================================
+
+model Interview {
+  id          String         @id @default(uuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  position    Position       // Position chosen for this interview (enum)
+  
+  // Link to aptitude test if user continued with previous scores
+  aptitudeTestId  String?
+  aptitudeTest    AptitudeTest?  @relation(fields: [aptitudeTestId], references: [id], onDelete: SetNull)
+  
+  // Interview execution
+  startedAt   DateTime       @default(now())
+  completedAt DateTime?
+  duration    Int?           // Total duration in seconds
+  status      InterviewStatus @default(IN_PROGRESS)
+  
+  // Evaluation results (6 parameters as percentages)
+  fluencyScore          Float?
+  grammarScore          Float?
+  confidenceScore       Float?
+  technicalKnowledgeScore Float?
+  vocabularyScore       Float?
+  analyticalThinkingScore Float?
+  overallScore          Float?
+  
+  // Relations
+  feedback    Feedback?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("interviews")
+}
+
+// ================================
+// FEEDBACK SYSTEM
+// ================================
+
+model Feedback {
+  id              String          @id @default(uuid())
+  
+  // Direct user reference for better performance
+  userId          String
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relations (either aptitude test or interview)
+  aptitudeTestId  String?         @unique
+  aptitudeTest    AptitudeTest?   @relation(fields: [aptitudeTestId], references: [id], onDelete: Cascade)
+  interviewId     String?         @unique
+  interview       Interview?      @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  
+  // Aptitude Test Scores (4 parameters) - only populated for aptitude feedback
+  domainKnowledgeScore    Float?      // Percentage score for Domain Knowledge
+  quantitativeScore       Float?      // Percentage score for Quantitative Aptitude
+  logicalReasoningScore   Float?      // Percentage score for Logical Reasoning
+  verbalAbilityScore      Float?      // Percentage score for Verbal Ability
+  aptitudeOverallScore    Float?      // Overall aptitude percentage
+  
+  // Interview Scores (6 parameters) - only populated for interview feedback
+  fluencyScore            Float?      // Percentage score for Fluency
+  grammarScore            Float?      // Percentage score for Grammar
+  confidenceScore         Float?      // Percentage score for Confidence
+  technicalKnowledgeScore Float?      // Percentage score for Technical Knowledge
+  vocabularyScore         Float?      // Percentage score for Vocabulary
+  analyticalThinkingScore Float?      // Percentage score for Analytical Thinking
+  interviewOverallScore   Float?      // Overall interview percentage
+  
+  // Feedback content
+  strengths           String[]        // Array of strengths
+  improvements        FeedbackImprovement[]
+  performanceInsights String[]        // Array of performance insights (3-5 key insights)
+  aptitudeInsights    String[]        // Array of aptitude insights (3-5 key insights)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("feedback")
+}
+
+model FeedbackImprovement {
+  id          String          @id @default(uuid())
+  feedbackId  String
+  feedback    Feedback        @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  
+  area        String          // Area that needs improvement
+  priority    Priority        // High, Medium, Low
+  description String?         // Additional description
+  
+  @@map("feedback_improvements")
+}
+
+// ================================
+// ACHIEVEMENT SYSTEM
+// ================================
+
+model Achievement {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String
+  type        AchievementType
+  criteria    Json      // Store criteria for achievement (flexible structure)
+  
+  // Relations
+  userAchievements UserAchievement[]
+  
+  createdAt   DateTime @default(now())
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  
+  unlockedAt    DateTime    @default(now())
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// ================================
+// ENUMS
+// ================================
+
+enum AptitudeCategory {
+  DOMAIN_KNOWLEDGE
+  QUANTITATIVE_APTITUDE
+  LOGICAL_REASONING
+  VERBAL_ABILITY
+}
+
+enum DifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum TestStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum InterviewStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum AchievementType {
+  FIRST_INTERVIEW
+  HIGH_SCORE
+  CONSISTENCY
+  TIME_SPENT
+}
+
+enum Position {
+  BACKEND_DEVELOPER
+  FRONTEND_DEVELOPER
+  FULL_STACK_DEVELOPER
+  DATA_ANALYST
+  AI_ML
+  CLOUD
+}
