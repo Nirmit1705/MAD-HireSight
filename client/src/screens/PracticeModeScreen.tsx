@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    // paddingBottom: 10,
   },
   headerCard: {
     backgroundColor: '#fff',
@@ -208,7 +207,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    // marginBottom: 20, // Removed to match Assessment layout
   },
   practiceContent: {
     gap: 16,

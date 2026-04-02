@@ -18,7 +18,10 @@ import ProfileScreen from './ProfileScreen';
 import PracticeModeScreen from './PracticeModeScreen';
 import AssessmentScreen from './AssessmentScreen';
 import PracticeTestScreen from './PracticeTestScreen';
+import PositionSelectionScreen from './PositionSelectionScreen';
+import InterviewFlow from './InterviewFlow';
 import { AuthService } from '../services/authService';
+import { ResumeAnalysis } from '../services/aiInterviewAPI';
 
 const { width } = Dimensions.get('window');
 
@@ -32,6 +35,13 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [showPracticeTest, setShowPracticeTest] = useState(false);
+  const [showPositionSelection, setShowPositionSelection] = useState(false);
+  const [showInterviewFlow, setShowInterviewFlow] = useState(false);
+  const [fromContinueAssessment, setFromContinueAssessment] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState('');
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [resumeAnalysis, setResumeAnalysis] = useState<ResumeAnalysis | null>(null);
+  const [isAiMode, setIsAiMode] = useState(false);
 
   useEffect(() => {
     loadUserData();
@@ -80,6 +90,26 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     );
   }
 
+  // Render Interview Flow if active
+  if (showInterviewFlow) {
+    return (
+      <InterviewFlow 
+        selectedPosition={selectedPosition}
+        selectedDomain={selectedDomain}
+        resumeAnalysis={resumeAnalysis}
+        isAiMode={isAiMode}
+        onBack={() => {
+          setShowInterviewFlow(false);
+          setShowPositionSelection(false);
+          setFromContinueAssessment(false);
+          setResumeAnalysis(null);
+          setIsAiMode(false);
+          setActiveTab('Dashboard');
+        }}
+      />
+    );
+  }
+
   // Render Practice Mode Screen if active
   if (activeTab === 'Practice') {
     return (
@@ -95,6 +125,39 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     );
   }
 
+  // Render Position Selection Screen if active
+  if (showPositionSelection) {
+    return (
+      <PositionSelectionScreen 
+        selectedPosition={selectedPosition}
+        setSelectedPosition={setSelectedPosition}
+        selectedDomain={selectedDomain}
+        setSelectedDomain={setSelectedDomain}
+        setResumeAnalysis={setResumeAnalysis}
+        setIsAiMode={setIsAiMode}
+        showHeader={showHeader}
+        onProfilePress={() => setActiveTab('Profile')}
+        onScroll={handleScroll}
+        onBack={() => {
+          setShowPositionSelection(false);
+          setFromContinueAssessment(false);
+          setResumeAnalysis(null);
+          setIsAiMode(false);
+        }}
+        onNavigate={(page) => {
+          if (page === 'interviewFlow') {
+            setShowInterviewFlow(true);
+          }
+        }}
+        route={{
+          params: {
+            fromContinueAssessment: fromContinueAssessment
+          }
+        }}
+      />
+    );
+  }
+
   // Render Assessment Screen if active
   if (activeTab === 'Assessment') {
     return (
@@ -103,8 +166,14 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           showHeader={showHeader}
           onProfilePress={() => setActiveTab('Profile')}
           onScroll={handleScroll}
-          onContinuePrevious={() => console.log('Continue with previous')}
-          onStartNew={() => console.log('Start new assessment')}
+          onContinuePrevious={() => {
+            setFromContinueAssessment(true);
+            setShowPositionSelection(true);
+          }}
+          onStartNew={() => {
+            setFromContinueAssessment(false);
+            setShowPositionSelection(true);
+          }}
         />
         <BottomNavBar activeTab={activeTab} onTabChange={setActiveTab} />
       </View>

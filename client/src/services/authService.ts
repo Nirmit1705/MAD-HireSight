@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../config';
 
-// Update this with your backend URL
-const API_BASE_URL = 'http://10.0.2.2:5000/api/auth';
+// Use centralized API URL
+const API_BASE_URL = `${API_URL}/api/auth`;
 
 interface AuthResponse {
   success: boolean;

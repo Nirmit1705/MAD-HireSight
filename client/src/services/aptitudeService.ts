@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../config';
 
-const API_BASE_URL = 'http://10.0.2.2:5000/api/aptitude';
+const API_BASE_URL = `${API_URL}/api/aptitude`;
 
 export interface Question {
   id: number;

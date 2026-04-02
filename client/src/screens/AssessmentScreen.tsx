@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../components/Header';
+import { API_URL } from '../config';
 
 interface AssessmentScreenProps {
   onContinuePrevious?: () => void;
@@ -25,9 +28,53 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
   onProfilePress,
   onScroll,
 }) => {
+  const [hasPreviousScore, setHasPreviousScore] = useState(false);
+  const [previousScore, setPreviousScore] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    checkPreviousAptitudeScore();
+  }, []);
+
+  const checkPreviousAptitudeScore = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem('accessToken');
+      
+      if (!token) {
+        setHasPreviousScore(false);
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/aptitude/previous-score`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.hasScore) {
+          setHasPreviousScore(true);
+          setPreviousScore(data.score);
+        } else {
+          setHasPreviousScore(false);
+        }
+      } else {
+        setHasPreviousScore(false);
+      }
+    } catch (error) {
+      console.error('Error checking previous score:', error);
+      setHasPreviousScore(false);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const handleContinuePrevious = () => {
-    if (onContinuePrevious) {
+    if (hasPreviousScore && onContinuePrevious) {
       onContinuePrevious();
     }
   };
@@ -64,48 +111,64 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
         </View>
 
         {/* Continue with Previous Score Card */}
-        <View style={styles.optionCard}>
+        <View style={[styles.optionCard, !hasPreviousScore && styles.optionCardDisabled]}>
           <View style={styles.cardHeaderRow}>
-            <View style={styles.iconContainer}>
+            <View style={[styles.iconContainer, !hasPreviousScore && styles.iconContainerDisabled]}>
               <Icon name="trophy-outline" size={32} color="#fff" />
             </View>
-            <Text style={styles.cardTitle}>Continue with Previous Score</Text>
+            <Text style={[styles.cardTitle, !hasPreviousScore && styles.cardTitleDisabled]}>
+              Continue with Previous Score
+            </Text>
           </View>
           
           <View style={styles.cardContent}>
-            <Text style={styles.cardDescription}>
-              Use your previous aptitude score (50%) and proceed to interview
-            </Text>
-            
-            {/* Features Grid */}
-            <View style={styles.featuresGrid}>
-              <View style={styles.featureItem}>
-                <Icon name="check-circle-outline" size={16} color="#111827" />
-                <Text style={styles.featureText}>Skip aptitude test</Text>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#000" />
+                <Text style={styles.loadingText}>Checking previous scores...</Text>
               </View>
-              <View style={styles.featureItem}>
-                <Icon name="check-circle-outline" size={16} color="#111827" />
-                <Text style={styles.featureText}>Use previous score</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Icon name="check-circle-outline" size={16} color="#111827" />
-                <Text style={styles.featureText}>Direct to interview</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Icon name="check-circle-outline" size={16} color="#111827" />
-                <Text style={styles.featureText}>Faster assessment</Text>
-              </View>
-            </View>
+            ) : (
+              <>
+                <Text style={[styles.cardDescription, !hasPreviousScore && styles.cardDescriptionDisabled]}>
+                  {hasPreviousScore 
+                    ? `Use your previous aptitude score (${previousScore}%) and proceed to interview`
+                    : 'No previous aptitude score found. Complete a new assessment first.'}
+                </Text>
+                
+                {hasPreviousScore && (
+                  <View style={styles.featuresGrid}>
+                    <View style={styles.featureItem}>
+                      <Icon name="check-circle-outline" size={16} color="#111827" />
+                      <Text style={styles.featureText}>Skip aptitude test</Text>
+                    </View>
+                    <View style={styles.featureItem}>
+                      <Icon name="check-circle-outline" size={16} color="#111827" />
+                      <Text style={styles.featureText}>Use previous score</Text>
+                    </View>
+                    <View style={styles.featureItem}>
+                      <Icon name="check-circle-outline" size={16} color="#111827" />
+                      <Text style={styles.featureText}>Direct to interview</Text>
+                    </View>
+                    <View style={styles.featureItem}>
+                      <Icon name="check-circle-outline" size={16} color="#111827" />
+                      <Text style={styles.featureText}>Faster assessment</Text>
+                    </View>
+                  </View>
+                )}
 
-            {/* Action Button */}
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={handleContinuePrevious}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.actionButtonText}>Continue Assessment</Text>
-              <Icon name="arrow-right" size={20} color="#fff" />
-            </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.actionButton, !hasPreviousScore && styles.actionButtonDisabled]}
+                  onPress={handleContinuePrevious}
+                  activeOpacity={0.8}
+                  disabled={!hasPreviousScore}
+                >
+                  <Text style={[styles.actionButtonText, !hasPreviousScore && styles.actionButtonTextDisabled]}>
+                    Continue Assessment
+                  </Text>
+                  <Icon name="arrow-right" size={20} color={hasPreviousScore ? "#fff" : "#9ca3af"} />
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
 
@@ -312,6 +375,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
+  },
+  actionButtonDisabled: {
+    backgroundColor: '#e5e7eb',
+  },
+  actionButtonTextDisabled: {
+    color: '#9ca3af',
+  },
+  optionCardDisabled: {
+    opacity: 0.6,
+    borderColor: '#d1d5db',
+  },
+  iconContainerDisabled: {
+    backgroundColor: '#9ca3af',
+  },
+  cardTitleDisabled: {
+    color: '#9ca3af',
+  },
+  cardDescriptionDisabled: {
+    color: '#9ca3af',
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#6b7280',
   },
   infoCard: {
     backgroundColor: '#f5f5f5',
