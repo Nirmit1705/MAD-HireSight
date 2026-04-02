@@ -6,6 +6,10 @@ import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth';
 import aptitudeRoutes from './routes/aptitude';
 import interviewRoutes from './routes/interview';
+import dashboardRoutes from './routes/dashboard';
+import aiInterviewRoutes from './routes/aiInterview';
+import metadataRoutes from './routes/metadata';
+import userRoutes from './routes/user';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import passport from './config/passport';
 
@@ -38,6 +42,10 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/api/aptitude', aptitudeRoutes);
 app.use('/api/interviews', interviewRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/ai-interview', aiInterviewRoutes);
+app.use('/api/metadata', metadataRoutes);
+app.use('/api/user', userRoutes);
 
 // Error handling middleware
 app.use(notFoundHandler);
