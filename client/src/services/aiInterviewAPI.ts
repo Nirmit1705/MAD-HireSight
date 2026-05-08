@@ -76,6 +76,58 @@ class AIInterviewAPI {
       console.error('❌ Error uploading resume:', error);
       throw error;
     }
+    }
+
+  async getInterviewHistory(limit: number = 10): Promise<any[]> {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await fetch(`${API_URL}/api/ai-interview/history?limit=${limit}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch interview history');
+      }
+
+      const data = await response.json();
+      return data.data?.interviews || [];
+    } catch (error) {
+      console.error('Error fetching interview history:', error);
+      throw error;
+    }
+  }
+
+  async getInterview(id: string): Promise<any> {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await fetch(`${API_URL}/api/ai-interview/interview/${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch interview details');
+      }
+
+      const data = await response.json();
+      return data.data?.interview;
+    } catch (error) {
+      console.error('Error fetching interview details:', error);
+      throw error;
+    }
   }
 }
 

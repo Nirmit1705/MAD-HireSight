@@ -12,9 +12,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { AuthService } from '../services/authService';
 
 // Configure Google Sign-In
-// TODO: Replace with your Web Client ID from Google Cloud Console
 GoogleSignin.configure({
-  webClientId: '955493235709-htnam5ci932okmng0qf6gje0bk4lapjh.apps.googleusercontent.com', 
+  webClientId: '955493235709-htnam5ci932okmng0qf6gje0bk4lapjh.apps.googleusercontent.com',
+  offlineAccess: true,
+  forceCodeForRefreshToken: true,
 });
 
 interface GoogleSignInButtonProps {
@@ -33,14 +34,27 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
       setLoading(true);
 
       // Check if Google Play services are available
-      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+      // Sign out first to force the account picker to show up
+      // This solves the issue of it "pre-assuming" the last picked account
+      try {
+        await GoogleSignin.signOut();
+      } catch (e) {
+        // Ignore if not signed in
+      }
 
       // Sign in with Google
       const userInfo = await GoogleSignin.signIn();
+      console.log('Google User Info:', userInfo);
       
-      // Get tokens (including ID token)
-      const tokens = await GoogleSignin.getTokens();
-      const idToken = tokens.idToken;
+      // The response shape varies by library version; prefer the nested data token when present.
+      let idToken = 'data' in userInfo ? userInfo.data?.idToken : undefined;
+      
+      if (!idToken) {
+        const tokens = await GoogleSignin.getTokens();
+        idToken = tokens.idToken;
+      }
 
       if (!idToken) {
         throw new Error('No ID token received from Google');
@@ -61,7 +75,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         }
       }
     } catch (error: any) {
-      console.error('Google Sign-In error:', error);
+      console.error('Google Sign-In error full:', error);
       
       let errorMessage = 'Failed to sign in with Google';
       
@@ -71,9 +85,13 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         errorMessage = 'Sign-In already in progress';
       } else if (error.code === 'PLAY_SERVICES_NOT_AVAILABLE') {
         errorMessage = 'Google Play Services not available';
+      } else if (error.message && error.message.includes('Network error')) {
+        errorMessage = 'Network error: Please verify your Web Client ID and SHA-1 fingerprint in the Google Console.';
+      } else if (error.message) {
+        errorMessage = error.message;
       }
       
-      Alert.alert('Error', errorMessage);
+      Alert.alert('Google Sign-In Error', errorMessage);
       if (onError) {
         onError(errorMessage);
       }

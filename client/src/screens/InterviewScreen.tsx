@@ -37,6 +37,7 @@ interface InterviewScreenProps {
   selectedDomain?: string;
   isAiMode?: boolean;
   onBack?: () => void;
+  onComplete?: (feedback: any) => void;
   skipPermissionCheck?: boolean;
 }
 
@@ -47,6 +48,7 @@ export const InterviewScreen: React.FC<InterviewScreenProps> = ({
   selectedDomain,
   isAiMode = false,
   onBack,
+  onComplete,
   skipPermissionCheck = false,
 }) => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(skipPermissionCheck ? true : null);
@@ -430,13 +432,14 @@ export const InterviewScreen: React.FC<InterviewScreenProps> = ({
     }
   };
 
-
-
   const completeInterview = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
-      
-      await fetch(`${API_URL}/api/ai-interview/complete-contextual-interview`, {
+      if (!token || !sessionId) {
+        throw new Error('Authentication or session missing');
+      }
+
+      const response = await fetch(`${API_URL}/api/ai-interview/complete-contextual-interview`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -444,6 +447,9 @@ export const InterviewScreen: React.FC<InterviewScreenProps> = ({
         },
         body: JSON.stringify({ sessionId }),
       });
+
+      const result = await response.json();
+      console.log('✅ Interview completed result:', result);
 
       // Clean up temporary audio files from cache before navigating away
       console.log('🧹 Cleaning up cache before completing interview...');
@@ -460,7 +466,9 @@ export const InterviewScreen: React.FC<InterviewScreenProps> = ({
 
       // Navigate back or to results
       setTimeout(() => {
-        if (onBack) {
+        if (onComplete && result.success) {
+          onComplete(result.data?.feedback || result.data);
+        } else if (onBack) {
           onBack();
         } else if (navigation) {
           navigation.navigate('Dashboard');
@@ -468,6 +476,7 @@ export const InterviewScreen: React.FC<InterviewScreenProps> = ({
       }, 2000);
     } catch (error) {
       console.error('Error completing interview:', error);
+      if (onBack) onBack();
     }
   };
 

@@ -1042,6 +1042,12 @@ Respond ONLY with valid JSON, no markdown.`;
           userId // Ensure user can only access their own interviews
         },
         include: {
+          aptitudeTest: {
+            select: {
+              id: true,
+              overallScore: true
+            }
+          },
           feedback: {
             include: {
               improvements: true  // Include full improvement records
@@ -1066,6 +1072,7 @@ Respond ONLY with valid JSON, no markdown.`;
         strengths: interview.feedback.strengths,
         performanceInsights: interview.feedback.performanceInsights,
         aptitudeInsights: interview.feedback.aptitudeInsights,
+        aptitudeOverallScore: interview.feedback.aptitudeOverallScore,
         improvements: interview.feedback.improvements.map(imp => ({
           id: imp.id,
           area: imp.area,
@@ -1090,6 +1097,8 @@ Respond ONLY with valid JSON, no markdown.`;
         data: {
           interview: {
             id: interview.id,
+            aptitudeTestId: interview.aptitudeTestId,
+            aptitudeOverallScore: interview.aptitudeTest?.overallScore ?? interview.feedback?.aptitudeOverallScore ?? null,
             position: formattedPosition,  // Use formatted position
             domain: formattedPosition,     // Use formatted position for domain too
             status: interview.status,

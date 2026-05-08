@@ -9,6 +9,7 @@ interface InterviewFlowProps {
   selectedDomain?: string;
   isAiMode?: boolean;
   onBack?: () => void;
+  onComplete?: (feedback: any) => void;
 }
 
 export const InterviewFlow: React.FC<InterviewFlowProps> = (props) => {

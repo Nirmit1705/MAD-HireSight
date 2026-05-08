@@ -3,41 +3,93 @@
  * @format
  */
 
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { BackHandler, View } from 'react-native';
 import SplashScreen from './src/screens/SplashScreen';
 import LandingScreen from './src/screens/LandingScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
+import { AuthService } from './src/services/authService';
 
 type Screen = 'splash' | 'landing' | 'signup' | 'signin' | 'dashboard';
 
 function App(): JSX.Element {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
+  const [screenStack, setScreenStack] = useState<Screen[]>(['splash']);
+  const [initialRoute, setInitialRoute] = useState<Screen>('landing');
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [isSplashFinished, setIsSplashFinished] = useState(false);
+
+  const currentScreen = screenStack[screenStack.length - 1];
+
+  useEffect(() => {
+    const resolveInitialRoute = async () => {
+      const authenticated = await AuthService.isAuthenticated();
+      setInitialRoute(authenticated ? 'dashboard' : 'landing');
+      setIsAuthChecked(true);
+    };
+
+    resolveInitialRoute();
+  }, []);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (currentScreen === 'dashboard') {
+        return true;
+      }
+
+      if (screenStack.length > 1) {
+        setScreenStack(previousStack => previousStack.slice(0, -1));
+      }
+
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [currentScreen, screenStack.length]);
+
+  useEffect(() => {
+    if (isSplashFinished && isAuthChecked && currentScreen === 'splash') {
+      setScreenStack([initialRoute]);
+    }
+  }, [currentScreen, initialRoute, isAuthChecked, isSplashFinished]);
+
+  const navigateTo = (screen: Screen) => {
+    setScreenStack(previousStack => [...previousStack, screen]);
+  };
+
+  const replaceWith = (screen: Screen) => {
+    setScreenStack([screen]);
+  };
+
+  const goBack = () => {
+    setScreenStack(previousStack => (previousStack.length > 1 ? previousStack.slice(0, -1) : previousStack));
+  };
 
   const handleSplashFinish = () => {
-    setCurrentScreen('landing');
+    setIsSplashFinished(true);
+
+    if (isAuthChecked) {
+      setScreenStack([initialRoute]);
+    }
   };
 
   const navigateToSignUp = () => {
-    setCurrentScreen('signup');
+    navigateTo('signup');
   };
 
   const navigateToSignIn = () => {
-    setCurrentScreen('signin');
-  };
-
-  const navigateToLanding = () => {
-    setCurrentScreen('landing');
+    navigateTo('signin');
   };
 
   const navigateToDashboard = () => {
-    setCurrentScreen('dashboard');
+    replaceWith('dashboard');
   };
 
   const handleLogout = () => {
-    setCurrentScreen('landing');
+    replaceWith('landing');
   };
 
   if (currentScreen === 'splash') {
@@ -45,11 +97,11 @@ function App(): JSX.Element {
   }
 
   if (currentScreen === 'signup') {
-    return <SignUpScreen onSignIn={navigateToSignIn} onBack={navigateToLanding} onSignUpSuccess={navigateToDashboard} />;
+    return <SignUpScreen onSignIn={navigateToSignIn} onBack={goBack} onSignUpSuccess={navigateToDashboard} />;
   }
 
   if (currentScreen === 'signin') {
-    return <SignInScreen onSignUp={navigateToSignUp} onBack={navigateToLanding} onSignInSuccess={navigateToDashboard} />;
+    return <SignInScreen onSignUp={navigateToSignUp} onBack={goBack} onSignInSuccess={navigateToDashboard} />;
   }
 
   if (currentScreen === 'dashboard') {

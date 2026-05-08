@@ -9,6 +9,7 @@ import {
   Dimensions,
   Animated,
   Image,
+  BackHandler,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomNavBar from '../components/BottomNavBar';
@@ -22,6 +23,9 @@ import PositionSelectionScreen from './PositionSelectionScreen';
 import InterviewFlow from './InterviewFlow';
 import { AuthService } from '../services/authService';
 import { ResumeAnalysis } from '../services/aiInterviewAPI';
+import HistoryScreen from './HistoryScreen';
+import HistoryDetailScreen from './HistoryDetailScreen';
+import FeedbackScreen from './FeedbackScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -42,6 +46,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const [selectedDomain, setSelectedDomain] = useState('');
   const [resumeAnalysis, setResumeAnalysis] = useState<ResumeAnalysis | null>(null);
   const [isAiMode, setIsAiMode] = useState(false);
+  const [historyId, setHistoryId] = useState<string | null>(null);
+  const [feedbackData, setFeedbackData] = useState<any>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [showHistoryDetail, setShowHistoryDetail] = useState(false);
 
   useEffect(() => {
     loadUserData();
@@ -53,6 +61,64 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
       loadUserData();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (showPracticeTest) {
+        setShowPracticeTest(false);
+        return true;
+      }
+
+      if (showFeedback) {
+        setShowFeedback(false);
+        setFeedbackData(null);
+        setActiveTab('Dashboard');
+        return true;
+      }
+
+      if (showInterviewFlow) {
+        setShowInterviewFlow(false);
+        return true;
+      }
+
+      if (showPositionSelection) {
+        setShowPositionSelection(false);
+        setFromContinueAssessment(false);
+        setResumeAnalysis(null);
+        setIsAiMode(false);
+        setActiveTab('Dashboard');
+        return true;
+      }
+
+      if (showHistoryDetail) {
+        setShowHistoryDetail(false);
+        return true;
+      }
+
+      if (activeTab === 'Profile') {
+        setActiveTab('Dashboard');
+        return true;
+      }
+
+      if (activeTab !== 'Dashboard') {
+        setActiveTab('Dashboard');
+        return true;
+      }
+
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [
+    activeTab,
+    showFeedback,
+    showHistoryDetail,
+    showInterviewFlow,
+    showPositionSelection,
+    showPracticeTest,
+  ]);
 
   const loadUserData = async () => {
     const userData = await AuthService.getUser();
@@ -98,6 +164,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         selectedDomain={selectedDomain}
         resumeAnalysis={resumeAnalysis}
         isAiMode={isAiMode}
+        onComplete={(feedback) => {
+          setFeedbackData(feedback);
+          setShowInterviewFlow(false);
+          setShowFeedback(true);
+        }}
         onBack={() => {
           setShowInterviewFlow(false);
           setShowPositionSelection(false);
@@ -155,6 +226,58 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           }
         }}
       />
+    );
+  }
+
+  // Render History Detail Screen if active
+  if (showHistoryDetail && historyId) {
+    return (
+      <HistoryDetailScreen 
+        historyId={historyId}
+        onBack={() => setShowHistoryDetail(false)}
+        onNavigate={(screen) => {
+          if (screen === 'Assessment') {
+            setShowHistoryDetail(false);
+            setActiveTab('Assessment');
+          }
+        }}
+      />
+    );
+  }
+
+  // Render Feedback Screen if active
+  if (showFeedback && feedbackData) {
+    return (
+      <FeedbackScreen 
+        position={selectedPosition}
+        domain={selectedDomain}
+        testScore={0} // Will be fetched or taken from feedbackData
+        interviewScore={0}
+        feedbackData={feedbackData}
+        onNavigate={(screen) => {
+          setShowFeedback(false);
+          if (screen === 'Dashboard') setActiveTab('Dashboard');
+          if (screen === 'History') setActiveTab('History');
+        }}
+      />
+    );
+  }
+
+  // Render History Screen if active
+  if (activeTab === 'History') {
+    return (
+      <View style={styles.container}>
+        <HistoryScreen 
+          onProfilePress={() => setActiveTab('Profile')}
+          onNavigate={(screen, id) => {
+            if (screen === 'historyDetail' && id) {
+              setHistoryId(id);
+              setShowHistoryDetail(true);
+            }
+          }}
+        />
+        <BottomNavBar activeTab={activeTab} onTabChange={setActiveTab} />
+      </View>
     );
   }
 

@@ -128,9 +128,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack, onLogout }) => {
           <View style={styles.profileHeader}>
             <View style={styles.avatarContainer}>
               <Icon name="account" size={60} color="#fff" />
-              <View style={styles.editBadge}>
-                <Icon name="camera" size={14} color="#fff" />
-              </View>
             </View>
             <Text style={styles.userName}>{user?.name}</Text>
             <Text style={styles.userEmail}>{user?.email}</Text>

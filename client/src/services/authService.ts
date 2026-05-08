@@ -54,6 +54,7 @@ export class AuthService {
 
       return data;
     } catch (error) {
+      console.error('API Error:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
@@ -89,6 +90,7 @@ export class AuthService {
 
       return data;
     } catch (error) {
+      console.error('API Error:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
@@ -123,6 +125,7 @@ export class AuthService {
 
       return data;
     } catch (error) {
+      console.error('API Error:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
@@ -210,6 +213,7 @@ export class AuthService {
 
       return data;
     } catch (error) {
+      console.error('API Error:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
@@ -240,6 +244,7 @@ export class AuthService {
 
       return data;
     } catch (error) {
+      console.error('API Error:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
